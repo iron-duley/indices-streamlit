@@ -37,7 +37,7 @@ st.title("📈 Major US Indices – Normalized Performance (2000–Today)")
 # Keys: Yahoo Finance ticker symbols
 # Values: Display names for the charts
 INDICES = {
-    ".DJI": "Dow Jones",        # Try with dot instead of caret
+    "DIA": "Dow Jones (DIA ETF)",        
     "^GSPC": "S&P 500",
     "^IXIC": "NASDAQ Composite",
     "^RUT": "Russell 2000",
