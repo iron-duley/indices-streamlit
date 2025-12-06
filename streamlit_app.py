@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 st.set_page_config(page_title="US Indices Dashboard", layout="wide")
-st.title("Major US Indices – Normalized Performance (2000–Today)")
+st.title("📈 Major US Indices – Normalized Performance (2000–Today)")
 
 INDICES = {
     "^DJI": "Dow Jones",
@@ -34,8 +34,12 @@ def get_data():
     norm = (data / data.dropna().iloc[0]) * 10
     return norm
 
-with st.spinner("Downloading data from 2000..."):
+with st.spinner("Downloading market data from 2000 to present..."):
     norm = get_data()
+
+# Optional: Show date range info
+latest_date = norm.index[-1].strftime('%B %d, %Y')
+st.markdown(f"**Data Range:** January 1, 2000 – {latest_date}")
 
 # Create the plot
 fig = go.Figure()
@@ -46,16 +50,26 @@ fig.update_layout(
     height=700,
     hovermode="x unified",
     template="plotly_white",
-    title=None,
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    title="Normalized Index Performance (Base = 10 on first trading day in 2000)",
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    xaxis_title="Date",
+    yaxis_title="Normalized Value (Base = 10)"
 )
 
 st.plotly_chart(fig, use_container_width=True)
 
 st.caption("Data source: Yahoo Finance via yfinance • Auto-updates daily • Data from Jan 1, 2000 to present")
-st.download_button(
-    label="Download CSV",
-    data=norm.to_csv().encode(),
-    file_name="us_indices_normalized_2000_present.csv",
-    mime="text/csv"
-)
+
+col1, col2 = st.columns(2)
+with col1:
+    st.download_button(
+        label="📥 Download CSV",
+        data=norm.to_csv().encode(),
+        file_name="us_indices_normalized_2000_present.csv",
+        mime="text/csv"
+    )
+with col2:
+    if st.button("🔄 Refresh Data"):
+        st.cache_data.clear()
+        st.rerun()
+        
