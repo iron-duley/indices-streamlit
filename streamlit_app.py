@@ -19,7 +19,7 @@ INDICES = {
 def get_data():
     dfs = []
     for symbol, name in INDICES.items():
-        df = yf.Ticker(symbol).history(period="max", interval="1d", auto_adjust=True)["Close"]
+        df = yf.Ticker(symbol).history(period="26", interval="1d", auto_adjust=True)["Close"]
         df = df.rename(name)
         dfs.append(df)
     data = pd.concat(dfs, axis=1)
