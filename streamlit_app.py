@@ -37,11 +37,11 @@ st.title("📈 Major US Indices – Normalized Performance (2000–Today)")
 # Keys: Yahoo Finance ticker symbols
 # Values: Display names for the charts
 INDICES = {
-    "^DJI": "Dow Jones",        # Dow Jones Industrial Average (30 large US companies)
-    "^GSPC": "S&P 500",         # S&P 500 Index (500 large US companies)
-    "^IXIC": "NASDAQ Composite", # NASDAQ Composite Index (technology-heavy)
-    "^RUT":  "Russell 2000",    # Russell 2000 Index (small-cap US companies)
-    "^NYA":  "NYSE Composite",  # NYSE Composite Index (all NYSE-listed stocks)
+    ".DJI": "Dow Jones",        # Try with dot instead of caret
+    "^GSPC": "S&P 500",
+    "^IXIC": "NASDAQ Composite",
+    "^RUT": "Russell 2000",
+    "^NYA": "NYSE Composite",
 }
 
 # Cache this function to speed up the app - data is stored for 1 hour
