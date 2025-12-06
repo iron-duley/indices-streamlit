@@ -24,7 +24,7 @@ def get_data():
         dfs.append(df)
     data = pd.concat(dfs, axis=1)
     data = data.asfreq("B").ffill()  # business days + forward fill
-    norm = (data / data.dropna().iloc[0]) * 26
+    norm = (data / data.dropna().iloc[0]) * 10
     return norm
 
 with st.spinner("Downloading 20+ years of data..."):
