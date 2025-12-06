@@ -16,7 +16,7 @@ INDICES = {
     "^NYA":  "NYSE Composite",
 }
 
-# Date picker (default = full history)
+# Date picker
 start_date = st.date_input(
     "Start date",
     value=pd.to_datetime("1928-01-01"),
@@ -26,32 +26,30 @@ start_date = st.date_input(
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def get_data(start: str):
-    dfs = []
+    all_data = []
     for symbol, name in INDICES.items():
-        # Download only from requested start date → super fast when zoomed
         df = yf.download(
             symbol,
             start=start,
             interval="1d",
             auto_adjust=True,
             progress=False
-        )["Close"]                     # ← returns a Series
-        df = df.to_frame(name=name)    # ← convert Series → DataFrame with proper column name
-        dfs.append(df)
+        )[["Close"]]                              # ← keep as DataFrame with "Close" column
+        df = df.rename(columns={"Close": name})      # ← rename column to index name
+        all_data.append(df)
     
-    data = pd.concat(dfs, axis=1)
-    data = data.asfreq("B").ffill()    # business days + forward-fill weekends/holidays
-    norm = (data / data.dropna().iloc[0]) * 100
+    data = pd.concat(all_data, axis=1)
+    data = data.asfreq("B").ffill()                  # business days + forward fill
+    norm = (data / data.dropna().iloc[0]) * 100      # normalize to 100%
     return norm
 
-# Load data
+# Load & show
 with st.spinner(f"Loading data from {start_date}..."):
-    norm = get_data(str(start_date))
+    normalized = get_data(str(start_date))
 
-# Plot
 fig = go.Figure()
-for col in norm.columns:
-    fig.add_trace(go.Scatter(x=norm.index, y=norm[col], mode="lines", name=col))
+for col in normalized.columns:
+    fig.add_trace(go.Scatter(x=normalized.index, y=normalized[col], mode="lines", name=col))
 
 fig.update_layout(
     height=700,
@@ -59,15 +57,14 @@ fig.update_layout(
     template="plotly_white",
     xaxis_rangeslider_visible=True,
     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-    margin=dict(l=20, r=20, t=40, b=20)
 )
 
 st.plotly_chart(fig, use_container_width=True, config={"scrollZoom": True})
 
-st.caption("Data: Yahoo Finance • Zoom, pan, and date picker all work instantly")
+st.caption("Data source: Yahoo Finance • Zoom / pan / date picker all work perfectly")
 st.download_button(
     "Download visible data as CSV",
-    data=norm.to_csv().encode(),
+    data=normalized.to_csv().encode(),
     file_name=f"us_indices_from_{start_date}.csv",
     mime="text/csv"
 )
